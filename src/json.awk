@@ -35,7 +35,15 @@ function json ( input , root , recursing ) {
    # object/array.
    if ( !recursing ) {
       current_pos=1; end=length(input); current_dec="{"; key="";
-      stacklevel=0; current_char="";
+      stacklevel=0; current_char=""; delete _tokens;
+      # Begin by putting each individual individual token on an individual line,
+      # and then shove them into the `_tokens` array.
+      gsub(/\"[^[:cntrl:]\"\\]*((\\[^u[:cntrl:]]|\\u[0-9a-fA-F]{4})[^[:cntrl:]\"\\]*)*\"|-?(0|[1-9][0-9]*)([.][0-9]*)?([eE][+-]?[0-9]*)?|null|false|true|\s+|./, "\n&", input)
+      gsub(/\n\s+\n/,input);
+      sub(/^\n/,"",input);
+      split(input,_tokens,"\n");
+      # Store the amount of tokens:
+      tokenamount=length(_tokens);
       # What to do with this string/number/bool very much depends whether we
       # are: In an object, or an array. If, in an object, we're dealing with a
       # key or value.
@@ -65,19 +73,20 @@ function json ( input , root , recursing ) {
       otype=0;
    }
 
-   # Keep looping until we reach the end of the string:
-   do {
-      # Our current character will dictate what in the world we'll do:
-      current_char=substr(input,current_pos,1);
+   # Keep parsing as long as 'current_pos' does not exceed the amount of tokens:
+   while ( current_pos < tokenamount ) {
+      # 'current_pos' refers to the token we're currently at. 'current_token' stores
+      # the token at our current position.
+      current_token=_tokens[current_pos];
 
       # Is it anything we expect?
-      if ( current_char !~ expect ) {
-         print "[!] Faulty JSON near #" current_pos ". Expected " expect ", got " current_char ". Bailing out.";
+      if ( current_token !~ expect ) {
+         print "[!] Faulty JSON near #" current_pos ". Expected " expect ", got " current_token ". Bailing out.";
          return 2;
       }
 
       # What do we do?
-      switch(current_char) {
+      switch(current_token) {
          #######################################################################
          # '{' - Generate a new object.
          #######################################################################
@@ -137,46 +146,35 @@ function json ( input , root , recursing ) {
          #######################################################################
          # '"' - Parse either a key or a value string.
          #######################################################################
-         case "\"":
-            # If we're dealing with a string:
-            # Keep looking for closing quotes:
-            len=current_pos+1;
-            do {
-               oldlen=len;
-               len+=index(substr(input,len+1),"\"");
-               # If the no unescaped double quote has been found, complain:
-               if ( len==oldlen ) { return 1; }
-               # If one has been found, quit:
-            } while ( is_escaped(substr(input,look_after),len) )
-
+         case /^"/:
             # What're we declaring?
             if ( current_dec=="{" ) {
                # If it's an object, fuss about keys/values:
                # If this a key, or a value?
                if ( (++otype%2)==1 ) {
-                  # It's a key. Assign it and offset our position.
-                  key=substr(input,current_pos+1,len-current_pos-1);
-                  current_pos+=length(key)+2
+                  # It's a key. Assign it and move ourselves to the next token.
+                  key=substr(current_token,2,length(current_token)-2);
+                  current_pos++
                   # Next expectation: whitespace, or colons.
                   expect="[ \\:]";
                } else {
                   # It's a value. Assign it and offset our position.
-                  root[key]=substr(input,current_pos+1,len-current_pos-1);
-                  current_pos+=length(root[key])+2
+                  root[key]=substr(current_token,2,length(current_token)-2);
+                  current_pos++
                   # Next expectation: a comma, or an object end:
                   expect="[ ,}]";
                }
             } else {
                # If it's an array, use standard numerical indices.
-               root[length(root)+1]=substr(input,current_pos+1,len-current_pos-1);
-               current_pos+=length(root[length(root)])+2
+               root[length(root)+1]=substr(current_token,2,length(current_token)-2);
+               current_pos++;
                # Next expectation: a comma, or an array end:
                expect="[ ,\\]]";
             } break;
          #######################################################################
          # Some sort of number, true, false, or null.
          #######################################################################
-         case /[0-9\-\+Ee\.tfn]/:
+         case /^[0-9\-\+Ee\.tfn]/:
             # Assign! What're we declaring?
             if ( current_dec=="{" ) {
                # Is it a key, or a value?
@@ -186,24 +184,25 @@ function json ( input , root , recursing ) {
                   return 3;
                } else {
                   # If it's a value, like it should be, assign it:
-                  root[key]=gensub(/^([0-9\-\+Ee\.]+|true|false|null).+$/,"\\1","G",substr(input,current_pos));
+                  root[key]=current_token
+                  #gensub(/^([0-9\-\+Ee\.]+|true|false|null).+$/,"\\1","G",substr(input,current_pos));
                   # Skip ahead:
-                  current_pos+=length(root[key]);
+                  current_pos++
                   # Next expectation: comma or object end:
                   expect="[ ,}]";
                }
             # Else, if we're in an array:
             } else {
                # If it's an array, use standard numerical indices:
-               root[length(root)+1]=gensub(/^([0-9\-\+Ee\.]+|true|false|null).+$/,"\\1","G",substr(input,current_pos));
-               current_pos+=length(root[length(root)]);
+               root[length(root)+1]=current_token;
+               current_pos++
                # Next expectation: comma or array end:
                expect="[ ,\\]]";
             } break;
          #######################################################################
          # Whitespace- skip ahead.
          #######################################################################
-         case " ": current_pos++; break;
+         case /^\s/: current_pos++; break;
          #######################################################################
          # Colons and commas- set new expectations.
          #######################################################################
@@ -213,5 +212,5 @@ function json ( input , root , recursing ) {
          case "]": expect="[ ,}\\]]"; current_pos++; otype=0; return 0; break;
          default:  current_pos++; break;
       }
-   } while ( current_pos <= end )
+   }
 }
