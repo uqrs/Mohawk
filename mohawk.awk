@@ -57,7 +57,7 @@
 # processes should always use single quotes.
 function sanitise_squote (input)
 {
-   return gensub(/'/,"'\\''","G",input)
+   return gensub(/'/,"'\\''","G",input) #"
 }
 ################################################################################
 # A function similar to sanitise() which escapes all magic characters in any
@@ -85,7 +85,7 @@ function sanitise (input)
 # The process for initialising plugins happens in three steps:
 # start_proc() is called, often by the function power_on() (which is
 # declared down below, and is often called when a channel is joined.)
-# start_proc() accepts only one argument: 'plugin' .It then calls
+# start_proc() accepts only one argument: 'plugin'. It then calls
 # plugin_header(), which then attempts to generate a process for the specified
 # plugins' file. This process is a shell command in the form of:
 # `gawk [varlist] [respondto] [addon] -f 'file' -e '{ print"";fflush() }' [end]`
@@ -200,7 +200,7 @@ function plugin_header(plugin)
       split(_global["_plugins"][plugin]["include"],_includes);
       for ( include in _includes ) {
          # Sanitise single quotes and escape double quotes. Deal with it.
-         gsub(/[" ]/,"",_includes[include]);
+         gsub(/[" ]/,"",_includes[include]); #"
          # Add an @include statement:
          include_list=include_list "@include \"" sanitise_squote(_includes[include]) "\"; "
          # Add the include file to _files:
