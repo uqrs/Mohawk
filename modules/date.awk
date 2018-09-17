@@ -34,7 +34,7 @@ BEGIN {
     command || (command="!")
 }
 ###############################################################################
-$4 ~ ( ":[" command "]" C_date "$" ) {
+$4 ~ ( "^:[" command "]" C_date "$" ) {
     # Reset essential variables:
     timeanddate=""; zoneinfo="";line="";
 

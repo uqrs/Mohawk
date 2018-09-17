@@ -21,7 +21,7 @@ BEGIN {
     C_die || (C_die="(die|man)")
 }
 
-$4 ~ ( ":[" command "]" C_die "$" ) {
+$4 ~ ( "^:[" command "]" C_die "$" ) {
     # We are TOTALLY not cheating by turning the fourth input record into a
     # spoofed command by taking the argument(s) and generating a new string
     # from it.

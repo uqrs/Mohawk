@@ -26,7 +26,7 @@ BEGIN {
 ################################################################################
 #
 ################################################################################
-$4 ~ ( ":[" command "]" cxml "$" ) {
+$4 ~ ( "^:[" command "]" cxml "$" ) {
     # Remove the leading colon and command operator:
     sub(/^\s*:./,"",$4);
     # If the command ends in 'is', then it's an image search request:

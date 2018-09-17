@@ -62,7 +62,7 @@ BEGIN {
     "quiet[q quiet]4/^$/ "
 
     # Safe-ify the quotes in @echoes:
-    gsub(/'/,"'\\''",echoes);
+    gsub(/'/,"'\\''",echoes); #"
 
     # 'echoes' defaults to 'cache/echo':
     echoes || (echoes="cache/echo")
@@ -76,7 +76,7 @@ BEGIN {
 }
 ###############################################################################
 # Now, we can start the real deal:
-$4 ~ ( ":[" command "]" C_echo "$" ) {
+$4 ~ ( "^:[" command "]" C_echo "$" ) {
     # Wipe important variables:
     remname="";remname_safe="";result="";PROC="";
     v1r="";v2r="";vdr="";ver="";link_notice="";verbosity="";

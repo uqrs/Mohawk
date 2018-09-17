@@ -137,7 +137,7 @@ BEGIN {
 }
 
 # Start our google command!
-$4 ~ ( ":[" command "]" C_google "$" ) {trigger_command=1}
+$4 ~ ( "^:[" command "]" C_google "$" ) {trigger_command=1}
 
 (trigger_command == 1) {
     # Assign '$3' to 'channel' so that we can use it later.

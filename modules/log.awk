@@ -43,9 +43,9 @@ BEGIN {
     for ( line in map_entries ) {
         split(map_entries[line],line_parts,",");
         channel=tolower(line_parts[1]);
-        log_tree[channel]["logfile"]=gensub(/'/,"'\\''","G",line_parts[2]);
-        log_tree[channel]["logformat"]=gensub(/'/,"'\\''","G",line_parts[3]);
-        log_tree[channel]["timestamp"]=gensub(/'/,"'\\''","G",line_parts[4]);
+        log_tree[channel]["logfile"]=gensub(/'/,"'\\''","G",line_parts[2]); #"
+        log_tree[channel]["logformat"]=gensub(/'/,"'\\''","G",line_parts[3]); #"
+        log_tree[channel]["timestamp"]=gensub(/'/,"'\\''","G",line_parts[4]); #"
     }
 
     # Clear up certain variables.

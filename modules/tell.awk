@@ -34,7 +34,7 @@ BEGIN {
 }
 ###############################################################################
 # Begin Regular Command Parsing.
-$4 ~ ( ":[" command "]" C_tell "$" ) {
+$4 ~ ( "^:[" command "]" C_tell "$" ) {
     # Reset contents.
     delete contents;
 

@@ -70,9 +70,10 @@ BEGIN {
 ################################################################################
 # If url[5] is present (i.e. someone posted a link, causing the above block to
 # trigger) also run.
-$4 ~ ( ":[" command "]" C_youtube "$" ) {trigger_command=1}
+$4 ~ ( "^:[" command "]" C_youtube "$" ) {trigger_command=1}
 
-trigger_command == 1 {
+(trigger_command == 1) {
+    trigger_command = 0;
     # Reset essential variables:
     results = "";info="";last_term="";search_result="";success=0
     delete fields;delete flags

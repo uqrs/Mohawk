@@ -74,7 +74,7 @@ BEGIN {
     command || (command="!")
 }
 
-$4 ~ ( ":[" command "]" C_pacman "$" ) {
+$4 ~ ( "^:[" command "]" C_pacman "$" ) {
     # Reset essential variables:
     json_in="";result_amount=0;dirty=0;
     delete flags; delete results; delete kvpairs; delete keyval;

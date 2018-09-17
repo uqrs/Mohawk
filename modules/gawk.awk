@@ -46,7 +46,7 @@ BEGIN {
     C_gawk || (C_gawk="(g?awk)")
 }
 ###############################################################################
-$4 ~ ( ":[" command "]" C_gawk "$" ) {
+$4 ~ ( "^:[" command "]" C_gawk "$" ) {
     # Reset essential variables:
     outstr="";spacing="";expressions=default_expressions;sep=default_sep; success=0
     delete arr; delete flags;
