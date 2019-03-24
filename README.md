@@ -1,8 +1,13 @@
 # Mohawk IRC Bot
+*As of **24/3/2019**, Mohawk is being superseded by [ircb](https://github.com/uqrs/ircb).
+Mohawk is no longer being maintained by its developer.*
+
 Mohawk is an IRC bot written in GNU/awk. It supports supports modular
 plugin functionality, primitive permission management,
 semi-IRCd-agnosticism, custom configuration syntax, runtime configuration
 editing and auto-rehashing functionality.
+
+
 
 ### Dependencies
 To run Mohawk, your system must have:
